@@ -37,7 +37,7 @@ stdlib.h    - Only for malloc and free statements.
 1. The user *RAM* is large enough to allow memory allocation to *200 MB* of array size. However, if needed, lesser memory allocation can be used by changing the buffer size in both codes.
 2. For proper working of both portions of *question 2*, it is assumed that the user has *read permissions* for both the files.
 3. It is assumed that the *Operating system* on which the code is tested/deployed is *Linux Based* (more specifically Ubuntu).
-4. For the printing of the *PROGRESS BAR*  in one line only, it is assumed the code will be opened in *full screen mode* of the terminal that runs it.
+4. For the printing of the ~PROGRESS BAR~  in one line only, it is assumed the code will be opened in *full screen mode* of the terminal that runs it.
 5. Basic assumptions understandably made, like a fully installed version of gcc (GCC 9.3.0 ) is available on the PC.
 
 
