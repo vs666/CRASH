@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#define BUFFER_LENGTH (1024 * 1024)
+#define BUFFER_LENGTH (100 * 1024 * 1024L)
 
 char p_b[100];
 
@@ -58,11 +58,13 @@ int refi(long int fptr, long int optr, long int file_size1, long int file_size2)
     char *st = (char *)malloc(1000);
     num = sprintf(st, "\e[?25l");
     write(1, st, num);
-    fflush(stdout);
-
-    lseek64(fptr, 0, SEEK_SET);
+    
+    num = sprintf(st, "\n\n");
+    write(1, st, num);
+    
+    lseek(fptr, 0, SEEK_SET);
     long int fcomp = 0;
-    lseek64(optr, 0, SEEK_SET);
+    lseek(optr, 0, SEEK_SET);
 
     long int fff = file_size1;
     long int rem_file_size = file_size1;
@@ -104,16 +106,21 @@ int refi(long int fptr, long int optr, long int file_size1, long int file_size2)
                 display(fcomp, file_size1);
             }
         }
+        free(ss);
+        free(sr);
         return 1;
     }
 
     long int disp = -BUFFER_LENGTH;
-    lseek64(optr, (-1 * BUFFER_LENGTH), SEEK_CUR);
-    char *ss = (char *)malloc((sizeof(char) * BUFFER_LENGTH));
-    char *sr = (char *)malloc((sizeof(char) * BUFFER_LENGTH));
+    lseek(optr, 0L, SEEK_END);
+    lseek(optr, (__off64_t)(-1 * BUFFER_LENGTH), SEEK_CUR);
     int e1 = 1, e2 = 1;
+    int count = 0;
     while (fff >= BUFFER_LENGTH && e1 && e2)
     {
+        char *ss = (char *)malloc((sizeof(char) * BUFFER_LENGTH));
+        char *sr = (char *)malloc((sizeof(char) * BUFFER_LENGTH));
+        count++;
         e1 = read(fptr, ss, BUFFER_LENGTH);
         if (e1 == -1)
         {
@@ -128,13 +135,11 @@ int refi(long int fptr, long int optr, long int file_size1, long int file_size2)
         }
         fff -= BUFFER_LENGTH;
         int z = 0;
-        for (int x = BUFFER_LENGTH - 1; x >= 0; x--)
+        for (long int x = BUFFER_LENGTH - 1; x >= 0; x--)
         {
             z++;
             if (ss[x] != sr[BUFFER_LENGTH - 1 - x])
             {
-                num = sprintf(st, "\n\nHere 1\n\n");
-                write(1, st, num);
                 return 0;
             }
             fcomp++;
@@ -144,13 +149,15 @@ int refi(long int fptr, long int optr, long int file_size1, long int file_size2)
                 display(fcomp, file_size1);
             }
         }
-        int r = lseek64(optr, (-2 * BUFFER_LENGTH), SEEK_CUR);
-        }
+        int r = lseek(optr, (__off64_t)(-2 * BUFFER_LENGTH), SEEK_CUR);
+        free(ss);
+        free(sr);
+    }
 
     char *ss1 = (char *)malloc((sizeof(char) * BUFFER_LENGTH));
     char *sr1 = (char *)malloc((sizeof(char) * BUFFER_LENGTH));
-    int r = lseek64(fptr, -BUFFER_LENGTH, SEEK_END);
-    lseek64(optr, 0L, SEEK_SET);
+    int r = lseek(fptr, -BUFFER_LENGTH, SEEK_END);
+    lseek(optr, 0L, SEEK_SET);
     e1 = read(fptr, ss1, BUFFER_LENGTH);
     e2 = read(optr, sr1, BUFFER_LENGTH);
     if (e1 == -1 || e2 == -1)
@@ -160,20 +167,14 @@ int refi(long int fptr, long int optr, long int file_size1, long int file_size2)
     }
     if (sizeof(ss1) != sizeof(sr1))
     {
-        num = sprintf(st, "\n\nHere 2\n\n");
-        write(1, st, num);
         return 0;
     }
     int z = 0;
-    num = sprintf(st, "Final Size is : %ld", fff);
-    write(1, st, num);
-    for (int x = (sizeof(ss1) / sizeof(char)) - 1; fff != 0 && x >= 0; x--)
+    for (int x = BUFFER_LENGTH - 1; fff != 0 && x >= 0; x--)
     {
         z++;
-        if (ss1[x] != sr1[(sizeof(ss1) / sizeof(char)) - 1 - x])
+        if (ss1[x] != sr1[BUFFER_LENGTH - 1 - x])
         {
-            num = sprintf(st, "\n\nHere 3 c1 : %d and c2 : %d . N is : %d.\n\n", ss1[x], ss1[(sizeof(ss1) / sizeof(char)) - 1 - x], x);
-            write(1, st, num);
             return 0;
         }
         fcomp++;
@@ -240,6 +241,7 @@ int main(int argc, char **argv)
         num = sprintf(st, "\n-----------------------------------------------------------------\n\n");
         write(1, st, num);
     }
+
     long int fptr, optr;
     struct stat sta1;
     stat(argv[1], &sta1);

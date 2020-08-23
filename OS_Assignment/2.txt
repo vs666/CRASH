@@ -1,5 +1,0 @@
-Hello World. How are you?
-
-I am fine. What about you?
-
-I am also fine.
