@@ -36,6 +36,6 @@ int findPath(char s[1000], String s4)
         }
         s2 = strtok(NULL, "/");
     }
-    
+
     return lev;
 }

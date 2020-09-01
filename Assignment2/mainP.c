@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,7 +10,7 @@
 #include "stack.h"
 #include "cd.h"
 #include "ls.h"
-
+#include "profork.h"
 // Couldn't use execvp to call an executable +so making a function instead
 void echo(char *message)
 {
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
     gethostname(system_name, 1000);
     while (1)
     {
-        String path = (String)malloc(1000);
+        String path = (String)calloc(1000, 1);
         getcwd(path, 1000);
         strlen(relp);
         path[strlen(relp) - 1] = '~';
@@ -93,58 +94,57 @@ int main(int argc, char *argv[])
         {
             pwd();
         }
-        else if (in[0] == 'c' && in[1] == 'd' && in[2] == ' ')
+        else if (in[0] == 'c' && in[1] == 'd' && (in[2] == ' ' || in[2] == '\t'))
         {
-
             // change directory code implementation
-
+            int min_index = 0;
             for (int x = 3; x < strlen(in); x++)
             {
-                if (in[x] != ' ')
+                if (in[x] != ' ' && in[x] != '\t')
                 {
-                    in = &(in[x]);
-                    break;
-                }
-            }
-            for (int x = strlen(in) - 1; x >= 0; x--)
-            {
-                if (in[x] == ' ' || in[x] == '\n' || in[x] == '\t')
-                {
-                    continue;
-                }
-                else
-                {
-                    in[x + 1] = '\0';
+                    min_index = x;
                     break;
                 }
             }
 
-            if (strlen(path) == 1 && path[0] == '~' && in[0] == '.' && in[1] == '.')
+            if (strlen(path) == 1 && path[0] == '~' && in[min_index] == '.' && in[min_index + 1] == '.')
             {
-                {
-                    String pt = (String)malloc(1000);
-                    getcwd(pt, 1000);
-                    printf("%s\n", pt);
-                    free(pt);
-                }
+                String ptz = (String)malloc(1000);
+                getcwd(ptz, 1000);
+                printf("%s\n", ptz);
+                free(ptz);
             }
             else
             {
                 String pt2 = (String)calloc(1000, 1);
                 String pt3 = (String)calloc(1000, 1);
                 strcpy(pt2, path);
-                strcpy(pt3, in);
+                pt3[0] = '.';
+                pt3[1] = '/';
+                for (int x = min_index; x < strlen(in); x++)
+                {
+                    if (in[x] == '\n' || in[x] == ' ' || in[x] == '\t')
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        pt3[2 + x - min_index] = in[x];
+                    }
+                }
+                String pt4 = (String)calloc(1000, 1);
+                strcpy(pt4, pt3);
                 int pt = changedir(pt2, pt3);
                 if (pt >= 0)
                 {
-                    int err = chdir(in);
+                    int err = chdir(pt4);
                     if (err)
                         perror("chdir");
                 }
                 else
                 {
                     printf("\033[1;31m");
-                    printf("Error : Cannot access lower than ~\n");
+                    printf("Error : Cannot access lower than ~/\n");
                     printf("\033[0m");
                     fflush(stdout);
                 }
@@ -213,6 +213,10 @@ int main(int argc, char *argv[])
                         {
                             in[x] = '\0';
                         }
+                        if (in[x] == ' ' || in[x] == '\t')
+                        {
+                            break;
+                        }
                         s2ls[tt++] = in[x];
                     }
                 }
@@ -232,6 +236,34 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        // free(in);
+        else
+        {
+            // forking any process
+            for (int x = strlen(in); x > 0; x--)
+            {
+                if (in[x] == ' ' || in[x] == '\t' || in[x] == '\n')
+                {
+                    in[x] = '\0';
+                }
+                else
+                {
+
+                    break;
+                }
+            }
+
+            int seq = 0;
+            if (in[0] == 'v' && in[1] == 'i' && (in[2] == ' ' || (in[2] == 'm' && in[3] == ' ')))
+            {
+                seq = 1;
+            }
+            if (seq == 0)
+                runParellal(in);
+            else
+            {
+                runSerial(in);
+            }
+        }
+        // free(path);
     }
 }
