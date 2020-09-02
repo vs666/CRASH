@@ -31,7 +31,7 @@ void ls_main(String s, String path)
     DIR *dir = opendir(path);
     if (dir == NULL)
     {
-        printf("\033[1;31m Error : Directory %s doesnot exist.\n\033[0m", path);
+        printf("\033[1;31m Error : Directory %s doesnot exist.\033[0m\n", path);
         return;
     }
     if (LISTALL)

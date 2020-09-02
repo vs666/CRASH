@@ -21,6 +21,7 @@ void runParellal(char *in)
     {
         execvp(arr[0], arr);
         exit(0);
+        printf("\nProcess\' %s \'exitted \n", in);
     }
     else
     {
@@ -35,7 +36,6 @@ void runSerial(char *in)
         "-c",
         in,
         NULL};
-    printf("%s\n", in);
     int ff = fork();
     if (ff == -1)
     {
@@ -50,8 +50,8 @@ void runSerial(char *in)
     else
     {
         // printf("%s\n", in);
-        printf("Process opened \n");
-        wait(NULL);
+        waitpid(ff, NULL, 0);
+        // printf("Process opened \n");
         return;
     }
 }
