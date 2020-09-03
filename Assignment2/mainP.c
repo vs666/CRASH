@@ -11,7 +11,7 @@
 #include "cd.h"
 #include "ls.h"
 #include "profork.h"
-
+#include "pinfor.h"
 // Couldn't use execvp to call an executable +so making a function instead
 
 void echo(char *message)
@@ -278,12 +278,32 @@ int main(int argc, char *argv[])
 
             // proc that runs sequentially and parellelly
             // parellel processes need to be called be a & sign at the end
-
+            else if (in[0] == 'p' && in[1] == 'i' && in[2] == 'n' && in[3] == 'f' && in[4] == 'o' && (strlen(in) == 5 || in[5] == '\n' || in[5] == ' '))
+            {
+                int index = -1;
+                String s_pid = (String)calloc(1000, 1);
+                for (int x = 5; x < strlen(in); x++)
+                {
+                    if (in[x] <= '9' && in[x] >= '0')
+                    {
+                        index = x;
+                        break;
+                    }
+                }
+                if (index == -1)
+                {
+                    sprintf(s_pid, "%d", getpid());
+                }
+                else
+                {
+                    strcpy(s_pid, &(in[index]));
+                }
+                pinformation(s_pid);
+            }
             else
             {
 
                 // Check if command is running from supposed construct or the bash command line
-                // printf(" DEBUG : bash command\n");
 
                 // forking any process
                 int seq = 1;
@@ -299,7 +319,7 @@ int main(int argc, char *argv[])
                         break;
                     }
                 }
-                for (int x = strlen(in); x > 0; x--)
+                for (int x = strlen(in) - 1; x > 0; x--)
                 {
                     if (in[x] == '&' && in[x - 1] == ' ')
                     {
@@ -309,6 +329,7 @@ int main(int argc, char *argv[])
                     }
                 }
 
+                printf(" DEBUG : bash command %d is seq\n", seq);
                 // using profork.h header file.
 
                 if (seq == 0)
@@ -318,9 +339,7 @@ int main(int argc, char *argv[])
                     runSerial(in);
                 }
             }
-
             in = strtok_r(NULL, ";", &tmp_r_strtok); // finds the next instruction
         }
     }
 }
-
