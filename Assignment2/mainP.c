@@ -12,6 +12,7 @@
 #include "ls.h"
 #include "profork.h"
 #include "pinfor.h"
+#include "hist.h"
 // Couldn't use execvp to call an executable +so making a function instead
 
 void echo(char *message)
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
     // get details for prompt-printing
     char *st = malloc(2000);
     int num;
+    getLog();
     char *username = (char *)malloc(1000);
     getlogin_r(username, 1000);
     char *system_name = (char *)malloc(1000);
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
         while (in != NULL)
         {
             // front trim code
-
+            append_log(in);
             for (int x = 0; x < 1000; x++)
             {
                 if (in[x] == 32 || in[x] == '\t')
@@ -299,6 +301,29 @@ int main(int argc, char *argv[])
                     strcpy(s_pid, &(in[index]));
                 }
                 pinformation(s_pid);
+            }
+            else if (in[0] == 'h' && in[1] == 'i' && in[2] == 's' && in[3] == 't' && in[4] == 'o' && in[5] == 'r' && in[6] == 'y' && (strlen(in) == 7 || in[7] == ' ' || in[7] == '\t' || in[7] == '\n'))
+            {
+                int xxc = 20;
+                for (int x = 7; x < strlen(in); x++)
+                {
+                    if (in[x] <= '9' && in[x] >= '0')
+                    {
+                        if (in[x + 1] >= '0' && in[x] <= '9')
+                            xxc = (in[x] - '0') * 10 + (in[x + 1] - '0');
+                        else
+                        {
+                            xxc = in[x] - '0';
+                        }
+                    }
+                }
+                // printf("xxc : %d\n", xxc);
+                if (xxc == 0)
+                {
+                    saveLog();
+                }
+                else
+                    show_log(xxc);
             }
             else
             {

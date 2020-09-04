@@ -1,0 +1,15 @@
+ls
+cd ..
+history
+history 0
+history 
+clear
+ls
+cd ..
+pinfo
+clear
+ls
+ls
+clear
+history
+history 0

@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <pwd.h>
@@ -94,7 +95,17 @@ void ls_main(String s, String path)
                 // printing in the long format
                 struct passwd *p = getpwuid(st.st_uid);
                 struct passwd *q = getpwuid(st.st_gid);
-                printf("%s %ld %s %s %ld\t", s1, st.st_nlink, p->pw_name, q->pw_name, st.st_size);
+                time(0);
+                time_t t1 = st.st_mtim.tv_sec;
+                String stime = asctime(localtime(&t1));
+                for (int x = strlen(stime) - 1; x >= 0; x--)
+                {
+                    if (stime[x] == '\n')
+                    {
+                        stime[x] = ' ';
+                    }
+                }
+                printf("%s %ld %s %s %ld\t%s ", s1, st.st_nlink, p->pw_name, q->pw_name, st.st_size, stime);
 
                 // color coding the mem-location type
                 if ((st.st_mode & S_IXOTH) == S_IXOTH)
@@ -140,19 +151,3 @@ void ls_main(String s, String path)
     printf("\n");
     closedir(dir);
 }
-
-// int main(int argc, char *argv[])
-// {
-//     if (argc == 1)
-//     {
-//         ls_main("", ".");
-//     }
-//     else if (argc == 2)
-//     {
-//         ls_main(argv[1],".");
-//     }
-//     else
-//     {
-//         ls_main(argv[1], argv[2]);
-//     }
-// }
