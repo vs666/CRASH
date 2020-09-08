@@ -6,8 +6,11 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <time.h>
-void runParellal(char *in)
+#include <errno.h>
+int runParellal(char *in)
 {
+    fflush(stdin);
+    fflush(stdout);
     char *arr[] = {
         "/bin/bash",
         "-c",
@@ -20,22 +23,21 @@ void runParellal(char *in)
     {
         pp = getpid();
         perror("fork : ");
-        return;
+        return -1;
     }
     else if (ff == (pid_t)0)
     {
-        setpgid(0, 0);
+        setpgrp();
         execvp(arr[0], arr);
-        exit(1);
     }
     else
     {
-        printf("Child Process ID : %d %d\n", ff, getgid());
-        tcsetpgrp(0, getgid());
-        // return;
+        struct sigaction sigchld_action = {
+            .sa_handler = SIG_DFL,
+            .sa_flags = SA_NOCLDWAIT};
+        sigaction(SIGCHLD, &sigchld_action, NULL);
+        return ff;
     }
-    // printf("Exited process %s\n", arr[0]);
-    // fflush(stdout);
 }
 
 void runSerial(char *in)
@@ -62,12 +64,13 @@ void runSerial(char *in)
     {
         do
         {
-            if ((pid = waitpid(pid, &status, WNOHANG)) == -1)
+            if ((pid = waitpid(pid, &status, WNOHANG)) == -1 && errno != 10) // check how to seperate ERRNO = 10 of parellal process from serial process
             {
+                fflush(stdout);
                 perror("wait() error");
                 return;
             }
-            else if (pid != 0)
+            else if (pid > 0)
             {
                 if (!WIFEXITED(status))
                     fprintf(stderr, "\nchild process %s did not exit successfully\n", arr[2]);

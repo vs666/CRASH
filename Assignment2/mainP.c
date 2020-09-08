@@ -65,7 +65,7 @@ int strcomp(char *s1, char *s2)
     }
     for (int x = 0; x < l; x++)
     {
-        if (s1[x] != s2[x])
+        if (s1[x] != s2[x] && s1[x] != '\n')
         {
             return 0;
         }
@@ -113,18 +113,17 @@ int main(int argc, char *argv[])
         while (in != NULL)
         {
 
+            // check for the exitted background processes
 
-            // check for the exitted background processes 
-            
-            for (int x = 0; x < stacsize; x++)
-            {
-                int *loc;
-                int v = waitpid(stac[x], loc, WNOHANG);
-                if (v > 0)
-                {
-                    printf("\nProcess %d exited with status %d\n", stac[x], *loc);
-                }
-            }
+            // for (int x = 0; x < stacsize; x++)
+            // {
+            //     int *loc;
+            //     int v = waitpid(stac[x], loc, WNOHANG);
+            //     if (v > 0 || v == -1)
+            //     {
+            //         printf("\nProcess %d exited with status %d\n", stac[x], *loc);
+            //     }
+            // }
             // front trim code
             append_log(in);
             for (int x = 0; x < 1000; x++)
@@ -308,7 +307,11 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-
+            else if (strcomp(in, "exit"))
+            {
+                saveLog();
+                exit(0);
+            }
             // proc that runs sequentially and parellelly
             // parellel processes need to be called be a & sign at the end
             else if (in[0] == 'p' && in[1] == 'i' && in[2] == 'n' && in[3] == 'f' && in[4] == 'o' && (strlen(in) == 5 || in[5] == '\n' || in[5] == ' '))
@@ -419,7 +422,10 @@ int main(int argc, char *argv[])
                 // using profork.h header file.
 
                 if (seq == 0)
-                    runParellal(in);
+                {
+                    int t101 = runParellal(in);
+                    stac[stacsize++] = t101;
+                }
                 else
                 {
                     runSerial(in);

@@ -2,7 +2,7 @@
 #define __PROCESS_FORK__
 
 
-void runParellal(char *in);
+int runParellal(char *in);
 void runSerial(char *in);
 
 

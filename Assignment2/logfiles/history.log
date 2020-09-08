@@ -1,15 +1,3 @@
-history 0
-ls
-clear
-ls
-clear
-ls
-clear
-ls
-clear
-ls
-c
-clear
 ls -al
 c
 clear
@@ -17,3 +5,15 @@ history
 history 0 
 history 
 history 0
+vim
+history 0
+ls
+history 
+exit
+exit 
+ls
+exit 
+exit 
+exit
+exit 
+exit 
