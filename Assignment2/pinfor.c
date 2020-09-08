@@ -38,7 +38,7 @@ void pinformation(String nm1)
     String mem_size = (String)malloc(1000);
     String pid_line = (String)malloc(1000);
     strcat(path1, "/status");
-    strcat(path2, "/comm");
+    strcat(path2, "/exe");
     fp = fopen(path1, "r");
     if (fp == NULL)
     {
@@ -67,16 +67,15 @@ void pinformation(String nm1)
         }
     }
 
-    fp = fopen(path2, "r");
-    if (fp == NULL)
+    if (readlink(path2, exe_name, 1000) <= 0)
     {
-        printf("\033[1m;33 ERRORss : Internal Error \033[0m\n");
+        printf("\033[1m;33 ERROR : Internal Error \033[0m\n");
         return;
     }
-    getline(&exe_name, &sz, fp);
     printf("%s", pid_line);
     printf("Process Status :        %c\n", status);
     printf("Memory :                %s", mem_size);
     printf("Executable Path :       %s\n", exe_name);
+    fflush(stdout);
     return;
 }

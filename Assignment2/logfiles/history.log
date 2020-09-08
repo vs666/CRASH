@@ -1,15 +1,19 @@
-ls
-cd ..
-history
 history 0
-history 
+ls
 clear
 ls
-cd ..
-pinfo
 clear
 ls
+clear
 ls
+clear
+ls
+c
+clear
+ls -al
+c
 clear
 history
+history 0 
+history 
 history 0

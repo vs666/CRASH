@@ -2,36 +2,44 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <time.h>
 void runParellal(char *in)
 {
-    printf("\nParellal\n");
     char *arr[] = {
         "/bin/bash",
         "-c",
         in,
         NULL};
-    int ff;
+    pid_t ff;
+    int status;
+    pid_t pp;
     if ((ff = fork()) == -1)
     {
+        pp = getpid();
         perror("fork : ");
         return;
     }
-    else if (ff == 0)
+    else if (ff == (pid_t)0)
     {
+        setpgid(0, 0);
         execvp(arr[0], arr);
-        exit(0);
+        exit(1);
     }
     else
     {
-        return;
+        printf("Child Process ID : %d %d\n", ff, getgid());
+        tcsetpgrp(0, getgid());
+        // return;
     }
+    // printf("Exited process %s\n", arr[0]);
+    // fflush(stdout);
 }
 
 void runSerial(char *in)
 {
-    printf("\nSerial\n");
     time_t t;
     char *arr[] = {
         "/bin/bash",
@@ -47,8 +55,6 @@ void runSerial(char *in)
     }
     else if (pid == 0)
     {
-        time(&t);
-        printf("child started at %s", ctime(&t));
         execvp(arr[0], arr);
         exit(1);
     }
@@ -63,12 +69,10 @@ void runSerial(char *in)
             }
             else if (pid != 0)
             {
-                time(&t);
-                printf("child exited at %s", ctime(&t));
-                if (WIFEXITED(status))
-                    printf("\nProcess %s exited successfully.\n", arr[2]);
-                else
+                if (!WIFEXITED(status))
                     fprintf(stderr, "\nchild process %s did not exit successfully\n", arr[2]);
+                // else
+                //     printf("\nProcess %s exited successfully.\n", arr[2]);
                 return;
             }
         } while (pid == 0);

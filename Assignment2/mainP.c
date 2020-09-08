@@ -10,6 +10,7 @@
 #include "stack.h"
 #include "cd.h"
 #include "ls.h"
+#include "nightwatch.h"
 #include "profork.h"
 #include "pinfor.h"
 #include "hist.h"
@@ -55,6 +56,23 @@ int changedir(char c_path[1000], char *query)
     return final_path;
 }
 
+int strcomp(char *s1, char *s2)
+{
+    int l = strlen(s2);
+    if (strlen(s1) < l)
+    {
+        return 0;
+    }
+    for (int x = 0; x < l; x++)
+    {
+        if (s1[x] != s2[x])
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 // main call
 int main(int argc, char *argv[])
 {
@@ -71,7 +89,8 @@ int main(int argc, char *argv[])
     getlogin_r(username, 1000);
     char *system_name = (char *)malloc(1000);
     gethostname(system_name, 1000);
-
+    pid_t stac[1000];
+    int stacsize = 0;
     while (1)
     {
         /*
@@ -79,7 +98,6 @@ int main(int argc, char *argv[])
          This is done as the assignment specified that the direcotory from which the terminal is called is the base directory 
         */
         String path = (String)calloc(1000, 1);
-
         getcwd(path, 1000);
         strlen(relp);
         path[strlen(relp) - 1] = '~';
@@ -94,6 +112,19 @@ int main(int argc, char *argv[])
         in = strtok_r(inall, ";", &tmp_r_strtok);
         while (in != NULL)
         {
+
+
+            // check for the exitted background processes 
+            
+            for (int x = 0; x < stacsize; x++)
+            {
+                int *loc;
+                int v = waitpid(stac[x], loc, WNOHANG);
+                if (v > 0)
+                {
+                    printf("\nProcess %d exited with status %d\n", stac[x], *loc);
+                }
+            }
             // front trim code
             append_log(in);
             for (int x = 0; x < 1000; x++)
@@ -325,6 +356,37 @@ int main(int argc, char *argv[])
                 else
                     show_log(xxc);
             }
+            else if (strcomp(in, "nightswatch"))
+            {
+                String st1 = (String)malloc(1000);
+                strcpy(st1, in);
+                String st2 = strtok(st1, " \n\t");
+                int time_def = 1; // default time delay
+                int sig = -1;
+                while (st2 != NULL)
+                {
+                    if (st2[0] >= '0' && st2[0] <= '9')
+                    {
+                        time_def = atoi(st2);
+                        // break;
+                    }
+                    if (strcomp(st2, "interrupt"))
+                    {
+                        sig = 1;
+                    }
+                    else if (strcomp(st2, "newborn"))
+                    {
+                        sig = 0;
+                    }
+                    st2 = strtok(NULL, " \t\n");
+                }
+                if (sig == -1)
+                {
+                    printf("\033[1;31m Error : Invalid command\033[0m\n");
+                }
+                else
+                    nw(time_def, sig);
+            }
             else
             {
 
@@ -337,7 +399,7 @@ int main(int argc, char *argv[])
                 {
                     if (in[x] == ' ' || in[x] == '\t' || in[x] == '\n')
                     {
-                        in[x] = '\0';
+                        in[x] = ' ';
                     }
                     else
                     {
@@ -354,7 +416,6 @@ int main(int argc, char *argv[])
                     }
                 }
 
-                printf(" DEBUG : bash command %d is seq\n", seq);
                 // using profork.h header file.
 
                 if (seq == 0)
