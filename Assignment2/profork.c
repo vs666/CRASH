@@ -4,13 +4,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
+
 int runParellal(char *in)
 {
-    fflush(stdin);
-    fflush(stdout);
     char *arr[] = {
         "/bin/bash",
         "-c",
@@ -27,15 +27,13 @@ int runParellal(char *in)
     }
     else if (ff == (pid_t)0)
     {
+        // signal(SIGKILL, handler);   // handles only killed processes
         setpgrp();
         execvp(arr[0], arr);
     }
     else
     {
-        struct sigaction sigchld_action = {
-            .sa_handler = SIG_DFL,
-            .sa_flags = SA_NOCLDWAIT};
-        sigaction(SIGCHLD, &sigchld_action, NULL);
+        signal(SIGCHLD, SIG_IGN);
         return ff;
     }
 }

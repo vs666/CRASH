@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <errno.h>
 #include "stack.h"
@@ -91,6 +92,7 @@ int main(int argc, char *argv[])
     gethostname(system_name, 1000);
     pid_t stac[1000];
     int stacsize = 0;
+
     while (1)
     {
         /*
@@ -113,17 +115,29 @@ int main(int argc, char *argv[])
         while (in != NULL)
         {
 
+            // HANDLING OF EXITTED PROCESSES
+            
             // check for the exitted background processes
-
             // for (int x = 0; x < stacsize; x++)
             // {
-            //     int *loc;
-            //     int v = waitpid(stac[x], loc, WNOHANG);
-            //     if (v > 0 || v == -1)
+            //     if (stac[x] == -1)
             //     {
-            //         printf("\nProcess %d exited with status %d\n", stac[x], *loc);
+            //         continue;
             //     }
+            //     // char *pathname111 = "/proc/";
+            //     // char *pathname112 = (char *)malloc(10);
+            //     // sprintf(pathname112, "%d", stac[x]);
+            //     // DIR *dirtmp = opendir(strcat(pathname111, pathname112));
+            //     // if (dirtmp == NULL && errno == ENOENT)
+            //     // {
+            //     //     printf("\nProcess %d has exited \n", stac[x]);
+            //     //     stac[x]=-1;
+            //     // }
+            //     // free(dirtmp);
+            //     // free(pathname111);
+            //     // free(pathname112);
             // }
+
             // front trim code
             append_log(in);
             for (int x = 0; x < 1000; x++)
