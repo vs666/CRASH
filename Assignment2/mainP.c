@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <stdio.h>
+#include <signal.h>
 #include <errno.h>
 #include "stack.h"
 #include "cd.h"
@@ -15,23 +16,65 @@
 #include "profork.h"
 #include "pinfor.h"
 #include "hist.h"
+
 // Couldn't use execvp to call an executable +so making a function instead
 
-void echo(char *message)
+pid_t stac[1000]; // contains all the processes
+int stacsize = 0; // size of the stac
+
+void handler(int sig)
 {
-    int op = write(1, message, strlen(message));
-    if (message[strlen(message) - 1] != '\n')
-        write(1, "\n", 1);
-    if (op != strlen(message))
+    int x;
+    pid_t pid = waitpid(-1, &x, WNOHANG);
+    if (pid > 0)
     {
-        perror("Echo : ");
+        for (int x = 0; x < stacsize; x++)
+        {
+            if (pid == stac[x])
+            {
+                stac[x] = -1;
+                if (WIFEXITED(x))
+                {
+                    if (WEXITSTATUS(x))
+                    {
+                        fprintf(stderr, "Process with pid %d exited with status %d\n", pid, WEXITSTATUS(x));
+                    }
+                    else
+                    {
+                        fprintf(stderr, "Process with pid %d exited normally\n", pid);
+                    }
+                    fflush(stdout);
+
+                    break;
+                }
+            }
+        }
     }
 }
 
+void echo(char *message)
+{
+    int co = 0;
+    if (message[strlen(message) - 1] != '\n')
+        co = 1;
+    String mes = strtok(message, " ");
+    while (mes != NULL)
+    {
+        int op = write(1, mes, strlen(mes));
+        if (mes[strlen(mes) - 1] != '\n')
+            write(1, " ", 1);
+        mes = strtok(NULL, " ");
+    }
+    if (co)
+        write(1, "\n", 1);
+}
+
 // simple procedure so single function is sufficient
+
 /*
     The getcwd function is used to find the path to current directory
 */
+
 void pwd()
 {
     char *st1 = malloc(1000);
@@ -57,6 +100,8 @@ int changedir(char c_path[1000], char *query)
     return final_path;
 }
 
+// check if s2 is a prefix of s1
+
 int strcomp(char *s1, char *s2)
 {
     int l = strlen(s2);
@@ -78,7 +123,11 @@ int strcomp(char *s1, char *s2)
 int main(int argc, char *argv[])
 {
 
+    // setup signal handler for background processes
+    signal(SIGCHLD, handler);
+
     // Stores the base directory path
+    int absolute_path = 0;
     char *relp = (char *)malloc(1000);
     getcwd(relp, 1000);
 
@@ -90,8 +139,6 @@ int main(int argc, char *argv[])
     getlogin_r(username, 1000);
     char *system_name = (char *)malloc(1000);
     gethostname(system_name, 1000);
-    pid_t stac[1000];
-    int stacsize = 0;
 
     while (1)
     {
@@ -101,10 +148,13 @@ int main(int argc, char *argv[])
         */
         String path = (String)calloc(1000, 1);
         getcwd(path, 1000);
-        strlen(relp);
-        path[strlen(relp) - 1] = '~';
-        char *mess = (char *)malloc(1000);
-        path = &(path[strlen(relp) - 1]);
+        // strlen(relp);
+        if (strcomp(path, relp))
+        {
+            path[strlen(relp) - 1] = '~';
+            char *mess = (char *)malloc(1000);
+            path = &(path[strlen(relp) - 1]);
+        }
         int num = sprintf(st, "<\033[1;36m%s@\033[1;32m%s:\033[1;33m%s\033[0m> ", username, system_name, path);
         write(1, st, num);
         char *in = (char *)calloc(1000, 1);
@@ -114,29 +164,6 @@ int main(int argc, char *argv[])
         in = strtok_r(inall, ";", &tmp_r_strtok);
         while (in != NULL)
         {
-
-            // HANDLING OF EXITTED PROCESSES
-            
-            // check for the exitted background processes
-            // for (int x = 0; x < stacsize; x++)
-            // {
-            //     if (stac[x] == -1)
-            //     {
-            //         continue;
-            //     }
-            //     // char *pathname111 = "/proc/";
-            //     // char *pathname112 = (char *)malloc(10);
-            //     // sprintf(pathname112, "%d", stac[x]);
-            //     // DIR *dirtmp = opendir(strcat(pathname111, pathname112));
-            //     // if (dirtmp == NULL && errno == ENOENT)
-            //     // {
-            //     //     printf("\nProcess %d has exited \n", stac[x]);
-            //     //     stac[x]=-1;
-            //     // }
-            //     // free(dirtmp);
-            //     // free(pathname111);
-            //     // free(pathname112);
-            // }
 
             // front trim code
             append_log(in);
@@ -179,50 +206,47 @@ int main(int argc, char *argv[])
                     }
                 }
 
-                if (strlen(path) == 1 && path[0] == '~' && in[min_index] == '.' && in[min_index + 1] == '.')
+                // if (strlen(path) == 1 && path[0] == '~' && in[min_index] == '.' && in[min_index + 1] == '.')
+                // {
+                //     String ptz = (String)malloc(1000);
+                //     getcwd(ptz, 1000);
+                //     printf("%s\n", ptz);
+                //     free(ptz);
+                // }
+                // else
+                // {
+
+                String pt2 = (String)calloc(1000, 1);
+                String pt3 = (String)calloc(1000, 1);
+                strcpy(pt2, path);
+                for (int x = min_index; x < strlen(in); x++)
                 {
-                    String ptz = (String)malloc(1000);
-                    getcwd(ptz, 1000);
-                    printf("%s\n", ptz);
-                    free(ptz);
-                }
-                else
-                {
-                    String pt2 = (String)calloc(1000, 1);
-                    String pt3 = (String)calloc(1000, 1);
-                    strcpy(pt2, path);
-                    pt3[0] = '.';
-                    pt3[1] = '/';
-                    for (int x = min_index; x < strlen(in); x++)
+                    if (in[x] == '\n' || in[x] == ' ' || in[x] == '\t')
                     {
-                        if (in[x] == '\n' || in[x] == ' ' || in[x] == '\t')
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            pt3[2 + x - min_index] = in[x];
-                        }
-                    }
-                    String pt4 = (String)calloc(1000, 1);
-                    strcpy(pt4, pt3);
-                    int pt = changedir(pt2, pt3);
-                    if (pt >= 0)
-                    {
-                        int err = chdir(pt4);
-                        if (err)
-                            perror("chdir");
+                        break;
                     }
                     else
                     {
-                        printf("\033[1;31m");
-                        printf("Error : Cannot access lower than ~/\n");
-                        printf("\033[0m");
-                        fflush(stdout);
+                        pt3[x - min_index] = in[x];
                     }
-                    free(pt3);
-                    free(pt2);
                 }
+                if (strcomp(pt3, "~"))
+                {
+                    String pttmp = (String)malloc(1000);
+                    strcpy(pttmp, &pt3[1]);
+                    strcpy(pt3, relp);
+                    strcat(pt3, pttmp);
+                    free(pttmp);
+                }
+                String pt4 = (String)calloc(1000, 1);
+                strcpy(pt4, pt3);
+                int pt = changedir(pt2, pt3);
+                int err = chdir(pt4);
+                if (err)
+                    perror("chdir");
+                free(pt3);
+                free(pt2);
+                // }
             }
 
             // if command is ls
@@ -331,6 +355,7 @@ int main(int argc, char *argv[])
             else if (in[0] == 'p' && in[1] == 'i' && in[2] == 'n' && in[3] == 'f' && in[4] == 'o' && (strlen(in) == 5 || in[5] == '\n' || in[5] == ' '))
             {
                 int index = -1;
+                int errorcode = 0;
                 String s_pid = (String)calloc(1000, 1);
                 for (int x = 5; x < strlen(in); x++)
                 {
@@ -339,8 +364,17 @@ int main(int argc, char *argv[])
                         index = x;
                         break;
                     }
+                    else if (in[x] != ' ' && in[x] != '\t' && in[x] != '\n')
+                    {
+                        errorcode = 1;
+                        break;
+                    }
                 }
-                if (index == -1)
+                if (errorcode == 1)
+                {
+                    printf("\nInvalid argument pinfo\n");
+                }
+                else if (index == -1)
                 {
                     sprintf(s_pid, "%d", getpid());
                 }
@@ -349,7 +383,8 @@ int main(int argc, char *argv[])
                     strcpy(s_pid, &(in[index]));
                 }
                 pinformation(s_pid);
-            }
+            } // HANDLING OF EXITTED PROCESSES
+
             else if (in[0] == 'h' && in[1] == 'i' && in[2] == 's' && in[3] == 't' && in[4] == 'o' && in[5] == 'r' && in[6] == 'y' && (strlen(in) == 7 || in[7] == ' ' || in[7] == '\t' || in[7] == '\n'))
             {
                 int xxc = 20;

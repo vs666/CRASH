@@ -14,7 +14,7 @@ ASSIGNMENT 2 - Operating Systems and Networking
 4.  *forktest.c*    -> contains code for running foreground and background child processes
 5.  *forktest.h*    -> header file for forktest.c
 
-6.  *cd.c*          -> contains code for changing directory ( more specifically a check to see cd doesnot go below ~ of our terminal)
+6.  *cd.c*          -> contains code for changing directory (Not needed anymore)
 7.  *cd.h*          -> header file for cd.c
 
 8.  *hist.c*        -> contains code for saving/loading/displaying history.
@@ -53,12 +53,6 @@ $ ./crash
 ``` bash
 <username@devicename:~/path> exit
 ```
-3. It is assumed that since 
-``` bash
-<username@devicename:~> cd ..
-```
-doesnot take to previous directory, thus the terminal in general has prevented access to directories before ~ in the shell. It is imposed using code written in cd.c file with cd.h as the header.
-
-4. Implementation of both `nweborn` and `interrupt` in nightswatch.
-5. To quit nightswatch we have to prompt by pressing `q` followed by `return`.
-
+3. Implementation of both `newborn` and `interrupt` in nightswatch.
+4. To quit nightswatch we have to prompt by pressing `q` followed by `return`.
+5. As a feature, it seemed wise to implement that echo doesnot take `" "` into account but does take `"\t"` into account.

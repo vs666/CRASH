@@ -27,13 +27,15 @@ int runParellal(char *in)
     }
     else if (ff == (pid_t)0)
     {
-        // signal(SIGKILL, handler);   // handles only killed processes
         setpgrp();
-        execvp(arr[0], arr);
+        if (execvp(arr[0], arr) < 0)
+        {
+            perror("\nexecvp error ");
+        }
     }
     else
     {
-        signal(SIGCHLD, SIG_IGN);
+        printf("\n[+1 background process] %d (pid) \n", ff);
         return ff;
     }
 }
@@ -72,8 +74,6 @@ void runSerial(char *in)
             {
                 if (!WIFEXITED(status))
                     fprintf(stderr, "\nchild process %s did not exit successfully\n", arr[2]);
-                // else
-                //     printf("\nProcess %s exited successfully.\n", arr[2]);
                 return;
             }
         } while (pid == 0);
