@@ -49,7 +49,7 @@ $ ./crash
 ## Assumptions and Important Details
 
 1. The length of all commands, arrays and stacks are assumed to be 1000 in length. This is a reasonable assumption but can be increased if needed.
-2. exit command should be used for exit so that history can be saved.To exit type :
+2. `exit` command should be used for exit so that history can be saved.To exit type :
 ``` bash
 <username@devicename:~/path> exit
 ```
@@ -60,5 +60,5 @@ $ ./crash
 doesnot take to previous directory, thus the terminal in general has prevented access to directories before ~ in the shell. It is imposed using code written in cd.c file with cd.h as the header.
 
 4. Implementation of both `nweborn` and `interrupt` in nightswatch.
-5. To quit nightswatch we have to prompt by pressing q followed by \n (return key).
+5. To quit nightswatch we have to prompt by pressing `q` followed by `return`.
 
