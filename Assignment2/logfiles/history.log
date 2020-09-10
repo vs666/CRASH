@@ -1,8 +1,3 @@
-clear
-nightswatch 
-nightswatch -n 1 interrupt 
-clear
-ls
 pinfo
 vim & 
 ps a
@@ -17,3 +12,8 @@ vim &
 ps a
 vim & 
 exit
+history
+		history 	
+clear
+clear
+exit 
