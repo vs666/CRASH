@@ -28,25 +28,25 @@ void handler(int sig)
     pid_t pid = waitpid(-1, &x, WNOHANG);
     if (pid > 0)
     {
-        for (int x = 0; x < stacsize; x++)
+        if (WIFEXITED(x) | WIFSIGNALED(x))
         {
-            if (pid == stac[x])
+            fprintf(stderr, "\n");
+            if (WEXITSTATUS(x))
             {
-                stac[x] = -1;
-                if (WIFEXITED(x))
-                {
-                    if (WEXITSTATUS(x))
-                    {
-                        fprintf(stderr, "Process with pid %d exited with status %d\n", pid, WEXITSTATUS(x));
-                    }
-                    else
-                    {
-                        fprintf(stderr, "Process with pid %d exited normally\n", pid);
-                    }
-                    fflush(stdout);
-
-                    break;
-                }
+                fprintf(stderr, "Process with pid %d exited with status %d", pid, WEXITSTATUS(x));
+            }
+            else
+            {
+                fprintf(stderr, "Process with pid %d exited normally", pid);
+            }
+            fprintf(stderr, "\n");
+            fflush(stderr);
+        }
+        for (int xx = 0; xx < stacsize; xx++)
+        {
+            if (pid == stac[xx])
+            {
+                stac[xx] = -1;
             }
         }
     }
@@ -142,10 +142,12 @@ int main(int argc, char *argv[])
 
     while (1)
     {
+
         /*
          path stores the current path relative to ~ as the relp path
          This is done as the assignment specified that the direcotory from which the terminal is called is the base directory 
         */
+
         String path = (String)calloc(1000, 1);
         getcwd(path, 1000);
         // strlen(relp);
@@ -348,10 +350,17 @@ int main(int argc, char *argv[])
             else if (strcomp(in, "exit"))
             {
                 saveLog();
+                for (int x = 0; x < stacsize; x++)
+                {
+                    if (stac[x] != -1)
+                        kill(stac[x], SIGKILL);
+                }
                 exit(0);
             }
+
             // proc that runs sequentially and parellelly
             // parellel processes need to be called be a & sign at the end
+            
             else if (in[0] == 'p' && in[1] == 'i' && in[2] == 'n' && in[3] == 'f' && in[4] == 'o' && (strlen(in) == 5 || in[5] == '\n' || in[5] == ' '))
             {
                 int index = -1;
@@ -387,7 +396,7 @@ int main(int argc, char *argv[])
 
             else if (in[0] == 'h' && in[1] == 'i' && in[2] == 's' && in[3] == 't' && in[4] == 'o' && in[5] == 'r' && in[6] == 'y' && (strlen(in) == 7 || in[7] == ' ' || in[7] == '\t' || in[7] == '\n'))
             {
-                int xxc = 20;
+                int xxc = 10;
                 for (int x = 7; x < strlen(in); x++)
                 {
                     if (in[x] <= '9' && in[x] >= '0')
@@ -400,11 +409,14 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
+                
                 // printf("xxc : %d\n", xxc);
+
                 if (xxc == 0)
                 {
                     saveLog();
                 }
+                
                 else
                     show_log(xxc);
             }

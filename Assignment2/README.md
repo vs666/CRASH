@@ -56,3 +56,5 @@ $ ./crash
 3. Implementation of both `newborn` and `interrupt` in nightswatch.
 4. To quit nightswatch we have to prompt by pressing `q` followed by `return`.
 5. As a feature, it seemed wise to implement that echo doesnot take `" "` into account but does take `"\t"` into account.
+6. All background processes need to be exitted and history saved, so shell will be exitted using `exit` command only.
+

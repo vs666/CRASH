@@ -1,19 +1,19 @@
-vim
-history 0
-ls
-history 
+
 exit
-exit 
-ls
-exit 
-exit 
+vi &  vim &  emacs & 
+ps a
+kill -s KILL 8623 
+clear
+ps a
 exit
-exit 
-exit 
-vim & 
-ps a
-kill -s KILL `pgrep vim` 
 ls
-ps a
+clear
+ls -la
+clear
+clear
+ls
+clear
+vim 
+clear
 clear
 exit 
