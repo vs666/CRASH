@@ -1,8 +1,3 @@
-
-exit
-vi &  vim &  emacs & 
-ps a
-kill -s KILL 8623 
 clear
 ps a
 exit
@@ -17,3 +12,8 @@ vim
 clear
 clear
 exit 
+ls
+clear
+ls -la
+clear
+exit

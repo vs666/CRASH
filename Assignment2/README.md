@@ -58,3 +58,19 @@ $ ./crash
 5. As a feature, it seemed wise to implement that echo doesnot take `" "` into account but does take `"\t"` into account.
 6. All background processes need to be exitted and history saved, so shell will be exitted using `exit` command only.
 
+## Starting the Shell
+
+To start the shell, for the first time : 
+
+``` bash
+$ ./init.sh
+$ ./crash
+```
+
+For subsequent changes and compilation 
+
+``` bash
+$ ./compile.sh
+$ ./crash.sh
+```
+
