@@ -73,6 +73,8 @@ $ ./crash
 To start the shell, for the first time : 
 
 ``` bash
+$ mkdir logfiles
+$ touch logfiles/history.log
 $ ./init.sh
 $ ./crash
 ```
