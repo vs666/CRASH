@@ -39,7 +39,16 @@ ASSIGNMENT 2 - Operating Systems and Networking
 18. *compile.sh*    -> script for compiling the shell
 
 
-## Compilation and usage
+## Compilation and usage - makefile compilation
+
+Go to the folder with code and compile
+
+``` bash
+$ make
+$ ./crash
+```
+
+## Compilation and usage - SHELL Compilation 
 
 ```bash
 $ ./compile.sh
