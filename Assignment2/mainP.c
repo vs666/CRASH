@@ -19,8 +19,9 @@
 
 // Couldn't use execvp to call an executable +so making a function instead
 
-pid_t stac[1000]; // contains all the processes
-int stacsize = 0; // size of the stac
+pid_t stac[1000];     // contains all the processes
+int stacsize = 0;     // size of the stac
+char *namestac[1000]; // name of process
 
 void handler(int sig)
 {
@@ -30,24 +31,27 @@ void handler(int sig)
     {
         if (WIFEXITED(x) | WIFSIGNALED(x))
         {
+            char *processName = (char *)malloc(1000);
+            for (int xx = 0; xx < stacsize; xx++)
+            {
+                if (pid == stac[xx])
+                {
+                    strcpy(processName, namestac[xx]);
+                    stac[xx] = -1;
+                }
+            }
             fprintf(stderr, "\n");
             if (WEXITSTATUS(x))
             {
-                fprintf(stderr, "Process with pid %d exited with status %d", pid, WEXITSTATUS(x));
+                fprintf(stderr, "Process %s exited with status %d", processName, WEXITSTATUS(x));
             }
             else
             {
-                fprintf(stderr, "Process with pid %d exited normally", pid);
+                fprintf(stderr, "Process %s exited normally", processName);
             }
+            free(processName);
             fprintf(stderr, "\n");
             fflush(stderr);
-        }
-        for (int xx = 0; xx < stacsize; xx++)
-        {
-            if (pid == stac[xx])
-            {
-                stac[xx] = -1;
-            }
         }
     }
 }
@@ -360,7 +364,7 @@ int main(int argc, char *argv[])
 
             // proc that runs sequentially and parellelly
             // parellel processes need to be called be a & sign at the end
-            
+
             else if (in[0] == 'p' && in[1] == 'i' && in[2] == 'n' && in[3] == 'f' && in[4] == 'o' && (strlen(in) == 5 || in[5] == '\n' || in[5] == ' '))
             {
                 int index = -1;
@@ -409,14 +413,14 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-                
+
                 // printf("xxc : %d\n", xxc);
 
                 if (xxc == 0)
                 {
                     saveLog();
                 }
-                
+
                 else
                     show_log(xxc);
             }
@@ -485,6 +489,8 @@ int main(int argc, char *argv[])
                 if (seq == 0)
                 {
                     int t101 = runParellal(in);
+                    namestac[stacsize] = (char *)malloc(1000);
+                    strcpy(namestac[stacsize], in);
                     stac[stacsize++] = t101;
                 }
                 else

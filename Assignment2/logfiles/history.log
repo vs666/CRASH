@@ -1,19 +1,19 @@
 clear
+nightswatch 
+nightswatch -n 1 interrupt 
+clear
+ls
+pinfo
+vim & 
 ps a
-exit
-ls
-clear
-ls -la
-clear
-clear
-ls
-clear
-vim 
-clear
-clear
+hist 
+history 
 exit 
 ls
-clear
-ls -la
-clear
+history 
+vim & 
+exit 
+vim & 
+ps a
+vim & 
 exit

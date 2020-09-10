@@ -57,6 +57,8 @@ $ ./crash
 4. To quit nightswatch we have to prompt by pressing `q` followed by `return`.
 5. As a feature, it seemed wise to implement that echo doesnot take `" "` into account but does take `"\t"` into account.
 6. All background processes need to be exitted and history saved, so shell will be exitted using `exit` command only.
+7. The pinfo command is more compatible with `Linux 5.4.0.45-generic` and OS `Ubuntu 20.04.1 LTS (Focal Fossa)`. This is just a precautionary assumption, and is not necessarily required for the proper working of the crash shell entirely.
+8. As clarified in the moodle query forum, the nightswatch command can be terminated using `q` + `Enter` command.
 
 ## Starting the Shell
 

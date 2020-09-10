@@ -1,3 +1,4 @@
+#include "nightwatch.h"
 #include <stdio.h>
 #include <sys/select.h>
 #include <sys/types.h>
@@ -7,7 +8,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
-
 int islastword(char *s1, char *s2)
 {
     int ml = strlen(s2);
