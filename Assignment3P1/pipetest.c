@@ -5,51 +5,40 @@
 
 int main()
 {
-    char *str = (char *)malloc(1000);
-    read(STDIN_FILENO, str, 1000);
-    if (str[strlen(str) - 1] == '\n')
+    // Code to demonstrate inter process pipe communication
+
+    int fd[2];
+
+    if (pipe(fd) < 0)
     {
-        str[strlen(str) - 1] = '|';
+        perror("pipe ");
+        exit(1);
     }
-    char *tok = strtok(str, "|");
-    printf("%s\n", tok);
-    FILE *fr = fopen(tok, "r+");
-    if (fr == NULL)
+    int pid = fork();
+    if (pid < 0)
     {
-        printf("NULL read file\n");
+        perror("fork");
+        exit(1);
     }
-    tok = strtok(NULL, "|");
-    if (tok == NULL)
+    if (pid == 0)
     {
-        printf("ERR: Tok is NULL\n");
+        close(fd[1]);
+        printf("[%d](child) > Waiting for content to be available.\n", getpid());
+        char strRead[102];
+        read(fd[0], strRead, 100);
+        printf("[%d](child) > Contents of child : %s\n", getpid(), strRead);
+        close(fd[0]);
     }
     else
     {
-        printf("%s\n", tok);
+        close(fd[0]);
+        sleep(2);
+        printf("[%d](Parent) > ", getpid());
+        char inp[102];
+        scanf("%s", inp);
+        write(fd[1], inp, 100);
+        close(fd[1]);
+        sleep(1);
     }
-    FILE *fw = fopen(tok, "w+");
-    if (fw == NULL)
-    {
-        printf("WRITE FILE is NULL\n");
-    }
-    int ar[2];
-    pipe(ar);
-    size_t siz = 10;
-    char str1[20];
-    while (fread(str1, 21, 1, fr))
-    {
-        printf("Debug point\n");
-        fflush(stdout);
-        printf("Writing to pipe : %s\n", str1);
-        write(ar[1], str1, 20);
-        char *str2 = (char *)malloc(100);
-        read(ar[0], str2, 20);
-        printf("Reading from pipe : %s\n", str2);
-        fprintf(fw, "%s", str2);
-        free(str2);
-    }
-    fclose(fw);
-    fclose(fr);
-    close(ar[0]);
-    close(ar[1]);
+    printf("Exitting all processes\n");
 }

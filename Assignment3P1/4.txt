@@ -1,10 +1,10 @@
-    PID TTY      STAT   TIME COMMAND
    1103 tty1     Ssl+   0:00 /usr/lib/gdm3/gdm-x-session gnome-session --autostart /usr/share/gdm/greeter/autostart
    1105 tty1     Sl+    0:01 /usr/lib/xorg/Xorg vt1 -displayfd 3 -auth /run/user/121/gdm/Xauthority -background none -noreset -keeptty -verbose 3
    1292 tty1     Sl+    0:00 /usr/libexec/gnome-session-binary --systemd --autostart /usr/share/gdm/greeter/autostart
    1803 tty2     Ssl+   0:00 /usr/lib/gdm3/gdm-x-session --run-script env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/gnome-session --systemd --session=ubuntu
-   1805 tty2     Sl+    4:47 /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -background none -noreset -keeptty -verbose 3
+   1805 tty2     Sl+    3:09 /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -background none -noreset -keeptty -verbose 3
    1860 tty2     Sl+    0:00 /usr/libexec/gnome-session-binary --systemd --systemd --session=ubuntu
    8629 pts/0    Ss     0:00 /bin/bash
-  14570 pts/0    R+     0:00 ./crash
-  14592 pts/0    R+     0:00 ps a
+   8970 pts/0    R+     0:00 ./crash
+   8972 pts/0    R+     0:00 ps a
+    PID TTY      STAT   TIME COMMAND

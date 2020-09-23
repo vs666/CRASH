@@ -44,6 +44,7 @@ void saveLog()
     if (fp == NULL)
     {
         printf("ERROR in saving command history.");
+        return;
     }
     displayNodes(20, fp);
     fclose(fp);

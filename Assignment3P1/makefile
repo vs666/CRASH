@@ -40,8 +40,6 @@ hist.o:  hist.h hist.c list.h list.c
 nightwatch.o:  nightwatch.h nightwatch.c  
 	gcc -g -c  nightwatch.c
 
-jobs.o: jobs.h jobs.c
-	gcc -g -c jobs.c
 
 mainP.o: mainP.c 
 	gcc -g -c mainP.c
