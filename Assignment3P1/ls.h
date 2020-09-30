@@ -3,6 +3,6 @@
 
 typedef char *String;
 
-void ls_main(String s, String path);
+int ls_main(String s, String path);
 
 #endif /* __LIST_COMMAND__ */

@@ -1,4 +1,5 @@
 crash: \
+			includefiles.h \
 			ls.o \
 			list.o \
 			stack.o \
@@ -13,34 +14,34 @@ crash: \
 	rm -f *.o 
 
 
-list.o:  list.h list.c
+list.o:	includefiles.h  list.h list.c
 	gcc -g -c list.c
 
-stack.o:  stack.h stack.c
+stack.o:	includefiles.h  stack.h stack.c
 	gcc -g -c stack.c
 
-ls.o:  ls.h ls.c  
+ls.o:	includefiles.h  ls.h ls.c 
 	gcc -g -c ls.c
 
-pinfor.o:  pinfor.h pinfor.c  
+pinfor.o:	includefiles.h  pinfor.h pinfor.c  
 	gcc -g -c pinfor.c
 
-profork.o:  profork.h profork.c  
+profork.o:	includefiles.h  profork.h profork.c  
 	gcc -g -c profork.c
 
 
-cd.o:  cd.h cd.c stack.c stack.h
+cd.o:	includefiles.h  cd.h cd.c stack.c stack.h
 	gcc -g -c  cd.c
 
 
-hist.o:  hist.h hist.c list.h list.c  
+hist.o:	includefiles.h  hist.h hist.c list.h list.c  
 	gcc -g -c  hist.c
 
 
-nightwatch.o:  nightwatch.h nightwatch.c  
+nightwatch.o:	includefiles.h  nightwatch.h nightwatch.c  
 	gcc -g -c  nightwatch.c
 
 
-mainP.o: mainP.c 
+mainP.o:	includefiles.h mainP.c 
 	gcc -g -c mainP.c
 

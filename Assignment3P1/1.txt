@@ -1,10 +1,6 @@
-    PID TTY      STAT   TIME COMMAND
-   1103 tty1     Ssl+   0:00 /usr/lib/gdm3/gdm-x-session gnome-session --autostart /usr/share/gdm/greeter/autostart
-   1105 tty1     Sl+    0:01 /usr/lib/xorg/Xorg vt1 -displayfd 3 -auth /run/user/121/gdm/Xauthority -background none -noreset -keeptty -verbose 3
-   1292 tty1     Sl+    0:00 /usr/libexec/gnome-session-binary --systemd --autostart /usr/share/gdm/greeter/autostart
-   1803 tty2     Ssl+   0:00 /usr/lib/gdm3/gdm-x-session --run-script env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/gnome-session --systemd --session=ubuntu
-   1805 tty2     Sl+    4:47 /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -background none -noreset -keeptty -verbose 3
-   1860 tty2     Sl+    0:00 /usr/libexec/gnome-session-binary --systemd --systemd --session=ubuntu
-   8629 pts/0    Ss     0:00 /bin/bash
-  14570 pts/0    R+     0:00 ./crash
-  14592 pts/0    R+     0:00 ps a
+PING google.com (172.217.167.206) 56(84) bytes of data.
+64 bytes from del03s18-in-f14.1e100.net (172.217.167.206): icmp_seq=1 ttl=118 time=50.1 ms
+
+--- google.com ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 50.095/50.095/50.095/0.000 ms

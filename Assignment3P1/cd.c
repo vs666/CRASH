@@ -1,9 +1,6 @@
 #include "cd.h"
 #include "stack.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "includefiles.h"
 // TEST implementation of string handler for cd command
 
 int findPath(char s[1000], String s4)

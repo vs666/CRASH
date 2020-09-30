@@ -1,19 +1,19 @@
-clear 
-cat 1.txt | grep Ss 
-cat 1.txt | grep Ss | wc 
-cat 1.txt | grep Ss > 2.txt 
-cat 2.txt 
+jobs
+fg 1 
+car
 clear
-rm 2.txt 
-cat 1.txt | grep ss > 2.txt 
-cat 2.txt 
-clea
+jobs
+cat
+fg 1 
+jobs 
 clear
-cat < 1.txt | wc -l > 2.txt 
-cat 2.txt 
-clear
-cat < 1.txt | wc -l 
-cat 1.txt | wc -l > 2.txt 
-cat 2.txt 
-c
+jobs
+cat
+jobs
+fg 1 
+jobs
+fg 1 
+ping google.com
+jobs
+fg 1 
 clear

@@ -1,13 +1,5 @@
 #include "profork.h"
-#include <sys/wait.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <time.h>
-#include <errno.h>
+#include "includefiles.h"
 
 int runParellal(char *in)
 {
@@ -40,8 +32,9 @@ int runParellal(char *in)
     }
 }
 
-void runSerial(char *in)
+int runSerial(char *in, int *fPid)
 {
+    int ex_code = -1;
     time_t t;
     char *arr[] = {
         "/bin/bash",
@@ -53,29 +46,21 @@ void runSerial(char *in)
     if ((pid = fork()) < 0)
     {
         perror("fork : ");
-        return;
+        return -1;
     }
     else if (pid == 0)
     {
-        execvp(arr[0], arr);
-        exit(1);
+
+        if ((ex_code = execvp(arr[0], arr)) < 0)
+        {
+            perror("execvp(foreground) failed");
+        }
     }
     else
     {
-        do
-        {
-            if ((pid = waitpid(pid, &status, WNOHANG)) == -1 && errno != 10) // check how to seperate ERRNO = 10 of parellal process from serial process
-            {
-                fflush(stdout);
-                perror("wait() error");
-                return;
-            }
-            else if (pid > 0)
-            {
-                if (!WIFEXITED(status))
-                    fprintf(stderr, "\nchild process %s did not exit successfully\n", arr[2]);
-                return;
-            }
-        } while (pid == 0);
+        *fPid = pid;
+        waitpid(pid, &status, WUNTRACED);
+        *fPid = -1;
+        return status;
     }
 }

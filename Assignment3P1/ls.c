@@ -1,19 +1,8 @@
 #include "ls.h"
-#include <string.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <time.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <pwd.h>
-
+#include "includefiles.h"
 typedef char *String;
 
-void ls_main(String s, String path)
+int ls_main(String s, String path)
 {
     int HIDDEN = 0;
     int LISTALL = 0;
@@ -33,7 +22,7 @@ void ls_main(String s, String path)
     if (dir == NULL)
     {
         printf("\033[1;31m Error : Directory %s doesnot exist.\033[0m\n", path);
-        return;
+        return 256;
     }
     if (LISTALL)
     {
@@ -150,4 +139,5 @@ void ls_main(String s, String path)
     }
     printf("\n");
     closedir(dir);
+    return 0;
 }

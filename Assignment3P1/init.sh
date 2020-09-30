@@ -2,5 +2,5 @@ mkdir logfiles
 cd logfiles
 touch history.log
 cd ..
-./compile.sh
+make
 echo "Initialization Complete. Run ./crash to start the shell"

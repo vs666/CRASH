@@ -1,14 +1,5 @@
 #include "pinfor.h"
-#include <sys/wait.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <time.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <fcntl.h>
+#include "includefiles.h"
 
 void pinformation(String nm1)
 {

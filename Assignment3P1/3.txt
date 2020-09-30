@@ -1,16 +1,1 @@
-COMMAND11 : grep st          
-forktest.c
-hist.c
-hist.h
-list.c
-list.h
-pipetest
-pipetest.c
-stack.c
-stack.h
-test.c
-test.h
- /usr/share/gdm/greeter/autostart
-   1292 tty1     Sl+    0:00 /usr/libexec/gnome-session-binary --systemd --autostart /usr/share/gdm/greeter/autostart
-   1803 tty2     Ssl+   0:00 /usr/lib/gdm3/gdm-x-session --run-script env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/gnome-session --systemd --session=ubuntu
-   1860 tty2     Sl+    0:00 /usr/libexec/gnome-session-binary --systemd --systemd --session=ubuntu
+[0m-rw-r--r-- 1 einzelganger einzelganger 888	Tue Sep 29 01:24:20 2020  2.txt

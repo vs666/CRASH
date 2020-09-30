@@ -1,7 +1,5 @@
 #include "hist.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "includefiles.h"
 #include "list.h"
 
 void getLog()
