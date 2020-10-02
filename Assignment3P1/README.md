@@ -10,7 +10,7 @@ Features of the shell include :
 6. A feature that shows Smile `:')` on successful execution of command and frown `:'(` other-wise.
 7. Ability to read, write and update `environment-variables` of the base OS / SHELL.
 8. Process handling, including running a process in background, bringing it to foreground etc.
-
+9. If input file doesnot exist during redirection, the smart shell makes `stdin` as default input.
 
 ## Codebase 
 
@@ -78,6 +78,11 @@ $ ./crash
 6. All background processes need to be exitted and history saved, so shell will be exitted using `exit` command only.
 7. The pinfo command is more compatible with `Linux 5.4.0.45-generic` and OS `Ubuntu 20.04.1 LTS (Focal Fossa)`. This is just a precautionary assumption, and is not necessarily required for the proper working of the crash shell entirely.
 8. Maximum number of parellal instruction that can be run is 1000 but can be changed by changing value of a constant which is `LIST-LEN`.
+9. Interrupt exits to processes is regarded failure and is greeted with a frown
+<!-- ## Feature still under supervision (not perfect for deployment)
+
+1. `fg` is not complete, and due to difference in `&` spawned background process and `ctrl+z` spawned background process, it is able to work correctly for only one (in my implementation of the shell, for `&` spawned background process).
+2. `bg` command (same reasons and bug as in fg process) -->
 
 ## Starting the Shell
 
@@ -101,5 +106,5 @@ $ ./crash.sh
 
 - Roll Number : *2019111015*
 - E-Mail : *varul.srivastava@research.iiit.ac.in*
-- Website : *researchweb.iiit.ac.in/~varul.srivastava*
+- Website : [*Varul Srivastava | IIIT Hyderabad*](researchweb.iiit.ac.in/~varul.srivastava)
 - Github : *https://github.com/vs666*

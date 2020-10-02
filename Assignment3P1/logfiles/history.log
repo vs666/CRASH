@@ -1,19 +1,19 @@
-jobs
-fg 1 
-car
-clear
-jobs
+ps a
 cat
-fg 1 
+ps a
+clear
+ls
 jobs 
+kjob 1
+kjob 1 9 
+
+ls
 clear
-jobs
+ls
+clear
+ls
+clear
+make
+c
+ls
 cat
-jobs
-fg 1 
-jobs
-fg 1 
-ping google.com
-jobs
-fg 1 
-clear
