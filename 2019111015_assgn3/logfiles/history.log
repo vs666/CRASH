@@ -13,3 +13,5 @@ clear
 clear
 ps -Q  ps -Q  ls  echo penguins c
 clear
+ls
+clear

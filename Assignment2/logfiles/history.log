@@ -1,19 +1,19 @@
-pinfo
-vim & 
-ps a
-hist 
-history 
-exit 
+clear
 ls
+clear
+cd ..
+clear
+cd ~
+clear
+code mainP.c
+code ls.c
+history 10 
+code hist.c
+history 10
+hist 10
 history 
-vim & 
-exit 
-vim & 
-ps a
-vim & 
-exit
-history
-		history 	
+history 20
+ls
 clear
-clear
-exit 
+history 1
+history 20

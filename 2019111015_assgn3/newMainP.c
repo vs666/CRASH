@@ -14,8 +14,6 @@
 
 int p_exitID = 0;
 
-int TMPIN;  //= dup(STDIN_FILENO);
-int TMPOUT; //= dup(STDOUT_FILENO);
 int fPid = -1;
 char *relp;
 char *lastDir[2];
@@ -221,9 +219,9 @@ void handleZ(int sig)
 {
     if (fPid != -1 && fPid != getpid())
     {
+        setpgrp();
         printf("Stopped process pid %d\n", fPid);
         kill(fPid, SIGTSTP);
-        // raise(SIGSTP);
         kill(getppid(), SIGCONT);
         stac[stacsize] = fPid;
         stac2[stacsize] = fPid;
@@ -243,7 +241,11 @@ void execCommand(char *in, char *path)
 {
     if (strcomp(in, "echo "))
     {
-        echo(&(in[5]));
+        for (int x = 0; x < stacsize; x++)
+        {
+            printf("%d stac ; %s stacname ; \n", stac[x], namestac[x]);
+        }
+        // echo(&(in[5]));
     }
     else if (in[0] == 'p' && in[1] == 'w' && in[2] == 'd')
     {
@@ -553,6 +555,21 @@ void execCommand(char *in, char *path)
     {
         char value[LIST_LEN];
         int c = -1;
+        for (int x = 0; x < strlen(in); x++)
+        {
+            if (c != -1 && in[x] == '"')
+            {
+                break;
+            }
+            else if (c == -1 && in[x] == '"')
+            {
+                c++;
+            }
+            else if (c != -1)
+            {
+                value[c++] = in[x];
+            }
+        }
         char *tmp1;
         int count = 0;
         char varName[LIST_LEN];
@@ -563,11 +580,6 @@ void execCommand(char *in, char *path)
             if (count == 2)
             {
                 strcpy(varName, token);
-            }
-            else if (count == 3)
-            {
-                c = 1;
-                strcpy(value, token);
             }
             token = strtok_r(NULL, " \t\n", &tmp1);
         }
@@ -585,7 +597,6 @@ void execCommand(char *in, char *path)
         char *tmp1;
         char *token = strtok_r(in, " \n", &tmp1);
         token = strtok_r(NULL, " \n", &tmp1);
-        strcpy(varName, token);
         if (token == NULL || strtok_r(NULL, " \n", &tmp1) != NULL)
         {
             p_exitID = ERR_INVALID;
@@ -647,6 +658,7 @@ void execCommand(char *in, char *path)
             }
             token = strtok_r(NULL, " \t\n", &tmp1);
         }
+        printf("%d is PNO\n", pNo);
         if (count != 3)
         {
             p_exitID = ERR_INVALID;
@@ -753,6 +765,7 @@ void execCommand(char *in, char *path)
 // Correct working
 void handleC(int sig)
 {
+    printf("fPid = %d\n", fPid);
     p_exitID = ERR_SIGINT;
     if (fPid > 0 && fPid != getpid())
     {
@@ -762,158 +775,6 @@ void handleC(int sig)
     }
 }
 
-int prompt(char *inall, char *path, int estat)
-{
-    char *in = (char *)calloc(LIST_LEN, 1); // Individual Atomic inputs
-    char *tmp_r_strtok;
-    in = strtok_r(inall, ";", &tmp_r_strtok);
-    while (in != NULL)
-    {
-        // Append History of Commands
-        append_log(in);
-        int countPipes = 0;
-        for (int x = 0; x < strlen(in); x++)
-        {
-            if (in[x] == '|')
-            {
-                countPipes++;
-            }
-        }
-        // printf("Pipes : %d", countPipes);
-        int fd[2];
-        char *nextTOK;
-        char *tmpIn = strtok_r(in, "|", &nextTOK);
-        in = trimString(in);
-        while (countPipes >= 0 && tmpIn != NULL && strlen(tmpIn) >= 1)
-        {
-            // char *pcom = (char *)malloc(LIST_LEN);
-            // sprintf(pcom, "COMMAND : %s\n", tmpIn);
-            // write(TMPOUT, pcom, strlen(pcom));
-            if (countPipes != 0)
-            {
-                countPipes--;
-                if (pipe(fd) < 0)
-                {
-                    perror("PIPE ERROR ");
-                    break;
-                }
-                // Write on pipe the O/P of the present command.
-                dup2(fd[1], STDOUT_FILENO);
-            }
-            else
-            {
-                countPipes--;
-                dup2(TMPOUT, STDOUT_FILENO);
-            }
-
-            // FILE REDIRECTION higher preference than PIPES
-            int fx = -1;
-            for (int x = 0; x < strlen(tmpIn); x++)
-            {
-                if (tmpIn[x] == '>' && tmpIn[x + 1] != '>' && (x != 0 && tmpIn[x - 1] != '>'))
-                {
-                    if (fx == -1)
-                        fx = x;
-                    int counter = 0;
-                    char *ipfn = (char *)calloc(1000, 1);
-                    for (int y = x + 1; y < strlen(tmpIn); y++)
-                    {
-                        if (tmpIn[y] != ' ')
-                            ipfn[counter++] = tmpIn[y];
-                        if (tmpIn[y] != ' ' && (tmpIn[y + 1] == '\0' || tmpIn[y + 1] == ' ' || tmpIn[y + 1] == '\t' || tmpIn[y + 1] == '\n'))
-                        {
-                            break;
-                        }
-                    }
-                    ipfn = trimString(ipfn);
-                    if (dup2(open(ipfn, O_RDWR | O_CREAT | O_TRUNC | __O_LARGEFILE, 0644), STDOUT_FILENO) == -1)
-                    {
-                        dup2(TMPOUT, STDOUT_FILENO);
-                        printf("ERROR : Output file not found. Setting output to stdout\n");
-                    }
-                    free(ipfn);
-                }
-                else if (tmpIn[x] == '<')
-                {
-                    if (fx == -1)
-                        fx = x;
-                    char *ipfn = (char *)calloc(1000, 1);
-                    for (int y = x + 1; y < strlen(tmpIn); y++)
-                    {
-                        ipfn[y - x - 1] = tmpIn[y];
-                        if (tmpIn[y] != ' ' && tmpIn[y + 1] == ' ')
-                        {
-                            break;
-                        }
-                    }
-                    ipfn = trimString(ipfn);
-                    write(TMPOUT, "\n", 1);
-                    write(TMPOUT, ipfn, strlen(ipfn));
-                    write(TMPOUT, "\n", 1);
-                    ipfn = trimString(ipfn);
-                    if (dup2(open(ipfn, O_RDWR | __O_LARGEFILE), STDIN_FILENO) == -1)
-                    {
-                        dup2(TMPIN, STDIN_FILENO);
-                        fprintf(stderr, "Error in finding input file, setting input to stdio instead.\n");
-                    }
-                    free(ipfn);
-                }
-                else if (tmpIn[x] == '>' && tmpIn[x + 1] == '>')
-                {
-                    if (fx == -1)
-                        fx = x;
-                    char *ipfn = (char *)calloc(1000, 1);
-                    for (int y = x + 2; y < strlen(in); y++)
-                    {
-                        ipfn[y - x - 2] = tmpIn[y];
-                        if (tmpIn[y] != ' ' && tmpIn[y + 1] == ' ')
-                        {
-                            break;
-                        }
-                    }
-                    ipfn = trimString(ipfn);
-                    if (dup2(open(ipfn, O_RDWR | O_APPEND | O_CREAT | __O_LARGEFILE, 0664), STDOUT_FILENO) == -1)
-                    {
-                        dup2(TMPOUT, STDOUT_FILENO);
-                        printf("ERROR : output file not found. Setting output to stdout\n");
-                    }
-                    free(ipfn);
-                }
-            }
-            for (int x = fx; x < strlen(tmpIn); x++)
-            {
-                tmpIn[x] = ' ';
-            }
-            tmpIn = trimString(tmpIn);
-            execCommand(tmpIn, path);
-            estat = errno;
-            // write(TMPOUT, "here", 4);
-            tmpIn = strtok_r(NULL, "|", &nextTOK);
-
-            // The content written in the pipe will serve as the input to next command
-            if (tmpIn != NULL)
-            {
-                dup2(fd[0], STDIN_FILENO);
-            }
-            else
-            {
-                dup2(TMPOUT, STDOUT_FILENO);
-            }
-            close(fd[0]);
-            close(fd[1]);
-        }
-
-        dup2(TMPIN, STDIN_FILENO);
-        dup2(TMPOUT, STDOUT_FILENO);
-        fflush(stdout);
-        fflush(stdin);
-        // Restoration of IO After each command
-        in = strtok_r(NULL, ";", &tmp_r_strtok); // finds the next instruction
-        strcpy(lastDir[1], lastDir[0]);
-        getcwd(lastDir[0], LIST_LEN);
-    }
-    return p_exitID;
-}
 int main()
 {
 
@@ -937,9 +798,8 @@ int main()
 
     char *st = (char *)malloc(2 * LIST_LEN);
     int num;
-    TMPIN = dup(STDIN_FILENO);
-    TMPOUT = dup(STDOUT_FILENO);
-    // Display prompt Line
+    int TMPIN = dup(STDIN_FILENO);
+    int TMPOUT = dup(STDOUT_FILENO);
     // dup2(STDIN_FILENO, TMPIN);
     // dup2(STDOUT_FILENO, TMPOUT);
 
@@ -967,6 +827,7 @@ int main()
             path = &(path[strlen(relp) - 1]);
         }
 
+        // Display prompt Line
         printf(":'%c<\033[1;36m%s@\033[1;32m%s:\033[1;33m%s\033[0m> ", (p_exitID == 0 ? ')' : '('), username, system_name, path);
         p_exitID = 0;
         // Input string declarations
@@ -977,33 +838,154 @@ int main()
         {
             closeShell();
         }
-        char *dd;
-        char dump[LIST_LEN];
-        int n = 0;
-        for (int x = 0; x < strlen(inall); x++)
-        {
-            if (inall[x] == '@' || inall[x] == '$')
-            {
-                dump[n] = inall[x];
-                n++;
-            }
-        }
-        n = 0;
-        int finalExit = 0;
-        char *command = strtok_r(inall, "$@", &dd);
-        while (command != NULL)
-        {
-            finalExit = prompt(command, path, estat);
-            if ((finalExit == 1 && dump[n] == '@') || (finalExit == 0 && dump[n] == '$'))
-            {
-                break;
-            }
-            n++;
-            command = strtok_r(NULL, "$@", &dd);
-        }
-
-        p_exitID = finalExit;
-        finalExit = 0;
         // free(tmpip);
+        char *in = (char *)calloc(LIST_LEN, 1); // Individual Atomic inputs
+        char *tmp_r_strtok;
+        in = strtok_r(inall, ";", &tmp_r_strtok);
+        while (in != NULL)
+        {
+            // Append History of Commands
+            append_log(in);
+            int countPipes = 0;
+            for (int x = 0; x < strlen(in); x++)
+            {
+                if (in[x] == '|')
+                {
+                    countPipes++;
+                }
+            }
+            // printf("Pipes : %d", countPipes);
+            int fd[2];
+            char *nextTOK;
+            char *tmpIn = strtok_r(in, "|", &nextTOK);
+            in = trimString(in);
+            while (countPipes >= 0 && tmpIn != NULL && strlen(tmpIn) >= 1)
+            {
+                // char *pcom = (char *)malloc(LIST_LEN);
+                // sprintf(pcom, "COMMAND : %s\n", tmpIn);
+                // write(TMPOUT, pcom, strlen(pcom));
+                if (countPipes != 0)
+                {
+                    countPipes--;
+                    if (pipe(fd) < 0)
+                    {
+                        perror("PIPE ERROR ");
+                        break;
+                    }
+                    // Write on pipe the O/P of the present command.
+                    dup2(fd[1], STDOUT_FILENO);
+                }
+                else
+                {
+                    countPipes--;
+                    dup2(TMPOUT, STDOUT_FILENO);
+                }
+
+                // FILE REDIRECTION higher preference than PIPES
+                int fx = -1;
+                for (int x = 0; x < strlen(tmpIn); x++)
+                {
+                    if (tmpIn[x] == '>' && tmpIn[x + 1] != '>' && (x != 0 && tmpIn[x - 1] != '>'))
+                    {
+                        if (fx == -1)
+                            fx = x;
+                        int counter = 0;
+                        char *ipfn = (char *)calloc(1000, 1);
+                        for (int y = x + 1; y < strlen(tmpIn); y++)
+                        {
+                            if (tmpIn[y] != ' ')
+                                ipfn[counter++] = tmpIn[y];
+                            if (tmpIn[y] != ' ' && (tmpIn[y + 1] == '\0' || tmpIn[y + 1] == ' ' || tmpIn[y + 1] == '\t' || tmpIn[y + 1] == '\n'))
+                            {
+                                break;
+                            }
+                        }
+                        ipfn = trimString(ipfn);
+                        if (dup2(open(ipfn, O_RDWR | O_CREAT | O_TRUNC | __O_LARGEFILE, 0644), STDOUT_FILENO) == -1)
+                        {
+                            dup2(TMPOUT, STDOUT_FILENO);
+                            printf("ERROR : Output file not found. Setting output to stdout\n");
+                        }
+                        free(ipfn);
+                    }
+                    else if (tmpIn[x] == '<')
+                    {
+                        if (fx == -1)
+                            fx = x;
+                        char *ipfn = (char *)calloc(1000, 1);
+                        for (int y = x + 1; y < strlen(tmpIn); y++)
+                        {
+                            ipfn[y - x - 1] = tmpIn[y];
+                            if (tmpIn[y] != ' ' && tmpIn[y + 1] == ' ')
+                            {
+                                break;
+                            }
+                        }
+                        ipfn = trimString(ipfn);
+                        write(TMPOUT, "\n", 1);
+                        write(TMPOUT, ipfn, strlen(ipfn));
+                        write(TMPOUT, "\n", 1);
+                        ipfn = trimString(ipfn);
+                        if (dup2(open(ipfn, O_RDWR | __O_LARGEFILE), STDIN_FILENO) == -1)
+                        {
+                            dup2(TMPIN, STDIN_FILENO);
+                            fprintf(stderr, "Error in finding input file, setting input to stdio instead.\n");
+                        }
+                        free(ipfn);
+                    }
+                    else if (tmpIn[x] == '>' && tmpIn[x + 1] == '>')
+                    {
+                        if (fx == -1)
+                            fx = x;
+                        char *ipfn = (char *)calloc(1000, 1);
+                        for (int y = x + 2; y < strlen(in); y++)
+                        {
+                            ipfn[y - x - 2] = tmpIn[y];
+                            if (tmpIn[y] != ' ' && tmpIn[y + 1] == ' ')
+                            {
+                                break;
+                            }
+                        }
+                        ipfn = trimString(ipfn);
+                        if (dup2(open(ipfn, O_RDWR | O_APPEND | O_CREAT | __O_LARGEFILE, 0664), STDOUT_FILENO) == -1)
+                        {
+                            dup2(TMPOUT, STDOUT_FILENO);
+                            printf("ERROR : output file not found. Setting output to stdout\n");
+                        }
+                        free(ipfn);
+                    }
+                }
+                for (int x = fx; x < strlen(tmpIn); x++)
+                {
+                    tmpIn[x] = ' ';
+                }
+                tmpIn = trimString(tmpIn);
+                execCommand(tmpIn, path);
+                estat = errno;
+                // write(TMPOUT, "here", 4);
+                tmpIn = strtok_r(NULL, "|", &nextTOK);
+
+                // The content written in the pipe will serve as the input to next command
+                if (tmpIn != NULL)
+                {
+                    dup2(fd[0], STDIN_FILENO);
+                }
+                else
+                {
+                    dup2(TMPOUT, STDOUT_FILENO);
+                }
+                close(fd[0]);
+                close(fd[1]);
+            }
+
+            dup2(TMPIN, STDIN_FILENO);
+            dup2(TMPOUT, STDOUT_FILENO);
+            fflush(stdout);
+            fflush(stdin);
+            // Restoration of IO After each command
+            in = strtok_r(NULL, ";", &tmp_r_strtok); // finds the next instruction
+            strcpy(lastDir[1], lastDir[0]);
+            getcwd(lastDir[0], LIST_LEN);
+        }
     }
 }

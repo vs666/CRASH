@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
         num = sprintf(st, "\e[?25l");
         write(1, st, num);
-
+    
         unsigned long int completed = 0;
 
         struct stat sta;

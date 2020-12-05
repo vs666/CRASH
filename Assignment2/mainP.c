@@ -405,12 +405,13 @@ int main(int argc, char *argv[])
                 {
                     if (in[x] <= '9' && in[x] >= '0')
                     {
-                        if (in[x + 1] >= '0' && in[x] <= '9')
+                        if (in[x + 1] >= '0' && in[x + 1] <= '9')
                             xxc = (in[x] - '0') * 10 + (in[x + 1] - '0');
                         else
                         {
                             xxc = in[x] - '0';
                         }
+                        break;
                     }
                 }
 

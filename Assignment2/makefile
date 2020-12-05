@@ -10,10 +10,8 @@ crash: \
 			mainP.o \
 			
 	gcc -o crash $^
+	rm -f *.o 
 
-
-clean:
-	rm *.o crash
 
 list.o:  list.h list.c
 	gcc -g -c list.c
